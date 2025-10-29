@@ -1,0 +1,42 @@
+flowchart LR
+  subgraph Dev[Developer Laptop]
+    TF[Terraform CLI]
+    Vars[terraform.tfvars (enable_* toggles)]
+  end
+
+  subgraph CI[GitHub Actions]
+    TF_CI[terraform-ci.yml]
+    ANS_CI[ansible-run.yml]
+    Secrets[Cloud & SSH Secrets]
+  end
+
+  Dev -->|git push/PR| CI
+  Dev -->|terraform apply (local)| Cloud[(AWS or GCP)]
+  CI -->|plan/apply| Cloud
+
+  subgraph Cloud[(AWS or GCP)]
+    direction TB
+    Backend[(Remote State:<br/>S3+DynamoDB or GCS)]
+    VM[(EC2 or GCE - DevOps VM)]
+    SG[Security Group / Firewall]
+  end
+
+  TF -->|State| Backend
+  CI -->|State| Backend
+
+  SG -.protects.-> VM
+
+  subgraph OnVM[DevOps VM (single host)]
+    direction TB
+    Base[Base OS + Users + SSH/SSM]
+    Docker[(Docker)]
+    K8S[(Kubernetes: kubectl + kind/minikube)]
+    Jenkins[(Jenkins)]
+    Mon[(Prometheus + Grafana)]
+    DevTools[(Git, Python, Terraform CLI, AWS/GCP CLI)]
+    Utils[(k9s, VS Code Server, Postman CLI)]
+  end
+
+  VM -->|Ansible over SSH/SSM| OnVM
+
+  click Backend "https://developer.hashicorp.com/terraform/language/settings/backends" _blank
