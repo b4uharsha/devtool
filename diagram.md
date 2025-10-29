@@ -1,3 +1,13 @@
+Flow Summary
+
+Developer runs terraform apply locally or commits to GitHub.
+GitHub Actions (terraform-ci.yml) triggers provisioning.
+Terraform creates VM + remote state backend.
+Ansible runs automatically to install tools.
+Services (Jenkins, Grafana, Prometheus, etc.) become accessible.
+Outputs show IP, URLs, kubeconfig paths, and credentials.
+
+                         
                          ┌─────────────────────────────┐
                          │     Developer Laptop        │
                          │─────────────────────────────│
